@@ -70,7 +70,7 @@ loop:
 		select {
 		case <-ctx.Done():
 			break loop
-		case <-time.After(3 * time.Second):
+		case <-time.After(3 * time.Second): //if you do it more often, then the management interface of the switches "falls off".
 			currSwitch := queue.Pop()
 			if inList(visited, currSwitch) {
 				continue
