@@ -65,12 +65,18 @@ func (nb *NetworkBuilder) Build(ctx context.Context, rootSwitchIP string, user s
 
 	var visited []*domain.Switch
 
+	timerDuration := 3 * time.Second //Switch polling interval. If you do it more often, then the management interface of the switches "falls off".
+	timer := time.NewTimer(timerDuration)
+	defer timer.Stop()
+
 loop:
 	for !queue.IsEmpty() {
+		timer.Reset(timerDuration)
+
 		select {
 		case <-ctx.Done():
 			break loop
-		case <-time.After(3 * time.Second): //if you do it more often, then the management interface of the switches "falls off".
+		case <-timer.C:
 			currSwitch := queue.Pop()
 			if inList(visited, currSwitch) {
 				continue
